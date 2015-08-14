@@ -6,7 +6,8 @@ var gulp = require('gulp'),
 	compass = require('gulp-compass'),
 	connect = require('gulp-connect'),
 	gulpif = require('gulp-if'),
-	uglify = require('gulp-uglify');
+	uglify = require('gulp-uglify'),
+	minifyHtml = require('gulp-minify-html');
 
 var env = process.env.NODE_ENV || 'development',
 	outputDir = 'builds/' + env + '/';
@@ -17,8 +18,8 @@ var coffeeSources = ['components/coffee/*.coffee'],
 	jsDestination = outputDir + 'js',
 	sassSources = ['components/sass/style.scss'],
 	sassDestination = outputDir + 'css',
-	htmlSources = [outputDir + '*.html'],
-	jsonSources = [outputDir + 'js/*.json'];
+	htmlSources = ['builds/development/*.html'],
+	jsonSources = ['builds/development/js/*.json'];
 
 gulp.task('coffee', function() {
 	gulp.src(coffeeSources)
@@ -39,7 +40,6 @@ gulp.task('js', function() {
 });
 
 gulp.task('compass', function() {
-	console.log(env);
 	gulp.src(sassSources)
 	.pipe(compass({
 		sass: 'components/sass',
@@ -69,6 +69,8 @@ gulp.task('connect', function() {
 
 gulp.task('html', function() {
 	gulp.src(htmlSources)
+	.pipe(gulpif(env == 'production', minifyHtml()))
+	.pipe(gulpif(env == 'production', gulp.dest(outputDir)))
 	.pipe(connect.reload());
 });
 

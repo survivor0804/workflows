@@ -6,14 +6,17 @@ var gulp = require('gulp'),
 	compass = require('gulp-compass'),
 	connect = require('gulp-connect');
 
+var env = process.env.NODE_ENV || 'development',
+	outputDir = 'builds/' + env + '/';
+
 var coffeeSources = ['components/coffee/*.coffee'],
 	coffeeDestination = 'components/scripts',
 	jsSources = ['components/scripts/*.js'],
-	jsDestination = 'builds/development/js',
+	jsDestination = outputDir + 'js',
 	sassSources = ['components/sass/style.scss'],
-	sassDestination = 'builds/development/css',
-	htmlSources = ['builds/development/*.html'],
-	jsonSources = ['builds/development/js/*.json'];
+	sassDestination = outputDir + 'css',
+	htmlSources = [outputDir + '*.html'],
+	jsonSources = [outputDir + 'js/*.json'];
 
 gulp.task('coffee', function() {
 	gulp.src(coffeeSources)
@@ -33,12 +36,13 @@ gulp.task('js', function() {
 });
 
 gulp.task('compass', function() {
+	console.log(env);
 	gulp.src(sassSources)
 	.pipe(compass({
 		sass: 'components/sass',
 		image: 'builds/development/images',
-		style: 'expanded',
-		comments: true
+		style: env == 'development' ? 'expanded' : 'compressed',
+		comments: env == 'development'
 	}))
 	.on('error', gutil.log)
 	.pipe(gulp.dest(sassDestination))
@@ -55,7 +59,7 @@ gulp.task('watch', function() {
 
 gulp.task('connect', function() {
 	connect.server({
-		root: 'builds/development',
+		root: outputDir,
 		livereload: true
 	});
 });

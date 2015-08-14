@@ -7,7 +7,8 @@ var gulp = require('gulp'),
 	connect = require('gulp-connect'),
 	gulpif = require('gulp-if'),
 	uglify = require('gulp-uglify'),
-	minifyHtml = require('gulp-minify-html');
+	minifyHtml = require('gulp-minify-html'),
+	jsonminify = require('gulp-jsonminify');
 
 var env = process.env.NODE_ENV || 'development',
 	outputDir = 'builds/' + env + '/';
@@ -76,6 +77,8 @@ gulp.task('html', function() {
 
 gulp.task('json', function() {
 	gulp.src(jsonSources)
+	.pipe(gulpif(env == 'production', jsonminify()))
+	.pipe(gulpif(env == 'production', gulp.dest(outputDir + 'js')))
 	.pipe(connect.reload());
 });
 
